@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Description;
 import com.example.demo.model.Recording;
 import com.example.demo.model.User;
 import com.example.demo.service.UsersService;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -28,23 +30,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity validateUser(@RequestParam String password, @RequestParam String username){
-        User check = service.getUserByUsername(username);
+    public ResponseEntity<User> validateUser(@RequestBody User user){
+        User check = service.getUserByUsername(user.getUsername());
 
-        if (check.getPassword().equals(password)){
-            return ResponseEntity.ok().build();
+        if (check.getPassword().equals(user.getPassword())){
+            return ResponseEntity.ok(check);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/register")
+    @PostMapping("/register")
+    @ResponseBody
     public ResponseEntity registerPage(@RequestBody User user){
-        if(service.getUserByUsername( user.getUsername() ) != null){
+        if(service.getUserByUsername( user.getUsername() ) == null){
             service.createUser(user);
         } else {
             return ResponseEntity.badRequest().build();
         }
-
         return ResponseEntity.ok().build();
     }
 

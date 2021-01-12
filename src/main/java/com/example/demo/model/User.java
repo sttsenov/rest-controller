@@ -22,12 +22,29 @@ public class User {
 
     private List<Recording> files = new ArrayList<>();
 
+    private Description description;
+
+    public User() { }
+
+    public User(String email, String password){
+        this.email = email;
+        this.password = password;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {
@@ -46,14 +63,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<Recording> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<Recording> files) {
-        this.files = files;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -70,31 +79,23 @@ public class User {
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
+    public List<Recording> getFiles() {
+        return files;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFiles(List<Recording> files) {
+        this.files = files;
     }
 
-    public User() { }
-
-    public User(String email, String password){
-        this.email = email;
-        this.password = password;
+    public Description getDescription(){
+        return description;
     }
 
-    @Override
-    public String toString(){
-        return  String.format(
-                "Customer[id=%s, firstName='%s', lastName='%s']",
-                id, firstName, lastName
-        );
+    public void setDescription(Description desc){
+        this.description = desc;
     }
 
     public void addRecordingToUser(Recording recording){
         this.files.add(recording);
     }
-
 }
