@@ -20,7 +20,7 @@ public class User {
     private String email;
     private String password;
 
-    private List<Recording> files = new ArrayList<>();
+    private List<String> files = new ArrayList<>();
 
     private Description description;
 
@@ -79,11 +79,11 @@ public class User {
         this.password = password;
     }
 
-    public List<Recording> getFiles() {
+    public List<String> getFiles() {
         return files;
     }
 
-    public void setFiles(List<Recording> files) {
+    public void setFiles(List<String> files) {
         this.files = files;
     }
 
@@ -95,7 +95,7 @@ public class User {
         this.description = desc;
     }
 
-    public void addRecordingToUser(Recording recording){
-        this.files.add(recording);
+    public void addRecordingToUser(String recordingId){
+        this.files.add(recordingId);
     }
 }

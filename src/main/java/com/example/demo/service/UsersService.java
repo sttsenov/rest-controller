@@ -67,15 +67,12 @@ public class UsersService {
         metaData.put("type", "audio");
         metaData.put("title", title);
 
-        Recording rec = new Recording(title);
-        recRep.save(rec);
-
-        user.getFiles().add(rec);
-        repository.save(user);
-
         ObjectId recId = gridFsTemplate.store(
                 file.getInputStream(), file.getName(), file.getContentType(), metaData
         );
+
+        user.getFiles().add(recId.toString());
+        repository.save(user);
 
         return recId.toString();
     }

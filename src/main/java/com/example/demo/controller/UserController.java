@@ -3,8 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.model.Description;
 import com.example.demo.model.Recording;
 import com.example.demo.model.User;
+import com.example.demo.model.form.RecordingForm;
 import com.example.demo.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -27,6 +30,11 @@ public class UserController {
     @GetMapping("/")
     public List<User> getHomepage(Model model){
         return service.getAllUsers();
+    }
+
+    @GetMapping("/test")
+    public Recording getTested() throws IOException {
+        return service.getRecording("5fff271a4753ee22730877c5");
     }
 
     @PostMapping("/login")
@@ -50,9 +58,10 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("{user}/add/recording")
-    public ResponseEntity postRecording(@PathVariable User user, @RequestParam String title, @RequestParam("file") MultipartFile file) throws IOException {
-        service.addRecording(title, file, user);
+    @PostMapping(path = "/add/recording", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity postRecording(RecordingForm recording) throws IOException {
+        User user = service.getUserByUsername(recording.getUsername());
+        service.addRecording("Eat ass!", recording.getFile(), user);
         return ResponseEntity.ok().build();
     }
 
