@@ -1,24 +1,21 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Description;
 import com.example.demo.model.Recording;
 import com.example.demo.model.User;
 import com.example.demo.model.form.RecordingForm;
 import com.example.demo.service.UsersService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -33,13 +30,23 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public Recording getTested() throws IOException {
-        return service.getRecording("5fff271a4753ee22730877c5");
+    public User getTested() throws IOException {
+        return service.getUserWithRecordings("5fff3a0660559651c84e4049");
+    }
+
+    @GetMapping(value = "/{id}/play", produces = {
+            MediaType.APPLICATION_OCTET_STREAM_VALUE })
+    public void playAudio(@PathVariable String id, HttpServletResponse response) throws IOException {
+        InputStream in = service.getRecording(id).getStream();
+
+        IOUtils.copy(in, response.getOutputStream());
+        response.flushBuffer();
     }
 
     @PostMapping("/login")
     public ResponseEntity<User> validateUser(@RequestBody User user){
         User check = service.getUserByUsername(user.getUsername());
+        check = service.getUserWithRecordings(check.getId());
 
         if (check.getPassword().equals(user.getPassword())){
             return ResponseEntity.ok(check);
@@ -61,7 +68,7 @@ public class UserController {
     @PostMapping(path = "/add/recording", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity postRecording(RecordingForm recording) throws IOException {
         User user = service.getUserByUsername(recording.getUsername());
-        service.addRecording("Eat ass!", recording.getFile(), user);
+        service.addRecording("sample title", recording.getFile(), user);
         return ResponseEntity.ok().build();
     }
 
@@ -76,7 +83,7 @@ public class UserController {
     @GetMapping("/recording/stream/{id}")
     public void streamRecording(@PathVariable String id, HttpServletResponse response) throws Exception {
         Recording rec = service.getRecording(id);
-        FileCopyUtils.copy(rec.getFile(), response.getOutputStream());
+        FileCopyUtils.copy(rec.getStream(), response.getOutputStream());
     }
 
     @GetMapping("/allRecordings")

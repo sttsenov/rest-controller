@@ -29,7 +29,7 @@ public class RecordingService {
         Recording rec = new Recording();
 
         rec.setTitle(file.getMetadata().get("title").toString());
-        rec.setFile(operations.getResource(file).getInputStream());
+        rec.setStream(operations.getResource(file).getInputStream());
 
         return rec;
     }

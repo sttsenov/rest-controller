@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +73,7 @@ public class UsersService {
                 file.getInputStream(), file.getName(), file.getContentType(), metaData
         );
 
-        user.getFiles().add(recId.toString());
+        user.getRecordingIds().add(recId.toString());
         repository.save(user);
 
         return recId.toString();
@@ -82,20 +84,14 @@ public class UsersService {
         Recording rec = new Recording();
 
         rec.setTitle(file.getMetadata().get("title").toString());
-        rec.setFile(operations.getResource(file).getInputStream());
+        rec.setStream(operations.getResource(file).getInputStream());
 
         return rec;
-
-        /*return user.files.stream()
-                .filter(recording -> recording.getId().equals(id))
-                .collect(Collectors.toList())
-                .get(0);
-
-         */
     }
 
     public List<Recording> getAllRecordings() throws IllegalStateException{
         List<Recording> files = new ArrayList<>();
+        OutputStream out = null;
 
         GridFSFindIterable file = gridFsTemplate.find(new Query(Criteria.where("_id").exists(true)));
 
@@ -116,4 +112,17 @@ public class UsersService {
         return files;
     }
 
+    public User getUserWithRecordings(String userId){
+        User user = getUserById(userId);
+
+        user.getRecordingIds().stream().forEach(rec -> {
+            try {
+                user.getFiles().add(getRecording(rec));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return user;
+    }
 }
